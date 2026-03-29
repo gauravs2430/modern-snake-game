@@ -11,8 +11,12 @@ const TICK_MS = 140;
 const board = document.querySelector("#board");
 const score = document.querySelector("#score");
 const status = document.querySelector("#status");
+const statePill = document.querySelector("#state-pill");
 const pauseButton = document.querySelector("#pause-button");
 const restartButton = document.querySelector("#restart-button");
+const boardOverlay = document.querySelector("#board-overlay");
+const overlayTitle = document.querySelector("#overlay-title");
+const overlayCopy = document.querySelector("#overlay-copy");
 const directionButtons = document.querySelectorAll("[data-direction]");
 
 let state = createInitialState({
@@ -51,6 +55,41 @@ function getStatusCopy() {
   }
 }
 
+function getStateLabel() {
+  switch (state.status) {
+    case "paused":
+      return "Paused";
+    case "game-over":
+      return "Game Over";
+    case "won":
+      return "Cleared";
+    default:
+      return "Running";
+  }
+}
+
+function getOverlayContent() {
+  switch (state.status) {
+    case "paused":
+      return {
+        title: "Paused",
+        copy: "Press Space or use Resume whenever you are ready.",
+      };
+    case "game-over":
+      return {
+        title: "Game Over",
+        copy: "You hit a wall or your own body. Restart to try again.",
+      };
+    case "won":
+      return {
+        title: "Board Cleared",
+        copy: "Every open cell has been filled. Restart for another run.",
+      };
+    default:
+      return null;
+  }
+}
+
 function render() {
   for (const cell of cells) {
     cell.className = "cell";
@@ -68,8 +107,20 @@ function render() {
 
   score.textContent = String(state.score);
   status.textContent = getStatusCopy();
+  statePill.textContent = getStateLabel();
+  statePill.dataset.state = state.status;
   pauseButton.textContent = state.status === "paused" ? "Resume" : "Pause";
   pauseButton.disabled = state.status === "game-over" || state.status === "won";
+
+  const overlay = getOverlayContent();
+
+  if (overlay) {
+    boardOverlay.hidden = false;
+    overlayTitle.textContent = overlay.title;
+    overlayCopy.textContent = overlay.copy;
+  } else {
+    boardOverlay.hidden = true;
+  }
 }
 
 function restartGame() {
