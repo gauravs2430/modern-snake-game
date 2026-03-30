@@ -1,6 +1,6 @@
 # Modern Snake
 
-I built this project as a small, dependency-free browser version of the classic Snake game. The goal was to keep the gameplay loop familiar and focused while still making the code clean enough to test, explain, and extend later.
+I built this project as a small, dependency-free browser version of the classic Snake game. The goal was to keep the gameplay loop familiar and focused while still making the code clean enough to test, explain, and extend later. At this point, the game is in a stable and playable state, with the start flow, overlays, score HUD, and controls all working together cleanly.
 
 ## What this project is
 
@@ -11,6 +11,8 @@ This is a modern presentation of the classic Snake formula:
 - Eating food grows the snake and increases the score.
 - Hitting a wall or your own body ends the run.
 - Each round starts in a ready state, so the snake does not move until you begin.
+- The overlay only appears for ready, paused, game-over, and cleared states, and stays out of the way during active play.
+- The HUD shows score, best score, snake length, and round state.
 - You can pause and restart at any time.
 
 I intentionally kept the project lightweight. There are no external libraries or frameworks here. The game runs with plain HTML, CSS, and JavaScript, and the core logic is separated from the DOM so the rules are easy to test.
@@ -20,11 +22,11 @@ I intentionally kept the project lightweight. There are no external libraries or
 - `index.html`
   The page layout, board container, buttons, and help panels.
 - `styles.css`
-  The visual treatment for the board, layout, controls, and responsive UI.
+  The visual treatment for the board, overlay states, HUD, controls, and responsive UI.
 - `src/game.js`
   The pure game logic: movement, turning, food placement, collisions, growth, pause handling, and restart state.
 - `src/main.js`
-  The browser controller that renders the board, listens for keyboard and touch input, and advances the game on a timer.
+  The browser controller that renders the board, manages overlay visibility, listens for keyboard and touch input, keeps the best score, and advances the game on a timer.
 - `tests/game.test.js`
   Core logic tests for movement, growth, collisions, and food placement.
 
@@ -48,6 +50,7 @@ npm run dev
 - Avoid the walls and your own body.
 - Press `Space` to pause or resume.
 - Press `R` or `Enter`, or click the restart button, to start over.
+- Watch the HUD for your current score, best score, snake length, and round state.
 
 ## Features currently included
 
@@ -59,6 +62,7 @@ npm run dev
 - Snake length tracking in the HUD
 - Game-over and board-cleared states
 - Ready-state start screen so the round does not auto-crash on load
+- Overlay system that only appears in non-playing states
 - Pause and restart controls
 - Keyboard and on-screen controls
 - Responsive single-page layout
@@ -75,6 +79,8 @@ npm test
 The tests cover:
 
 - Initial state creation
+- Starting the round from the ready state
+- Preventing movement before the round starts
 - Preventing immediate reverse turns
 - Movement updates
 - Snake growth after eating
@@ -86,13 +92,13 @@ The tests cover:
 
 The next improvements I would consider are:
 
-- Start screen and best score tracking
 - Difficulty levels or increasing speed over time
 - Wrap-around mode as an optional ruleset
 - Sound effects and mute control
 - Mobile swipe input
 - Obstacles or special food types
 - Local multiplayer or turn-based challenge modes
+- Daily challenge or score attack modes
 - Theme selection and accessibility options
 
 ## Why I like this version
