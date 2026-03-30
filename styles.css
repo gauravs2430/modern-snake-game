@@ -47,7 +47,6 @@ body {
 }
 
 .shell-top,
-.meta-strip,
 .actions,
 .controls,
 .controls-row,
@@ -86,7 +85,10 @@ h1 {
 }
 
 .meta-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+  min-width: min(100%, 460px);
 }
 
 .metric-card,
@@ -117,6 +119,10 @@ h1 {
 
 .state-pill {
   font-size: 0.98rem;
+}
+
+.state-pill[data-state="ready"] {
+  color: #8a5c18;
 }
 
 .state-pill[data-state="running"] {
@@ -194,38 +200,68 @@ h1 {
 
 .cell--snake {
   background: var(--snake);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .cell--head {
   background: var(--snake-head);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .cell--food {
   background: var(--food);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .board-overlay {
   position: absolute;
   inset: 14px;
   z-index: 1;
-  display: grid;
-  place-items: center;
+  display: none;
   text-align: center;
+  place-items: center;
+  gap: 18px;
   padding: 24px;
   border-radius: 22px;
-  background: rgba(34, 29, 22, 0.6);
+  background:
+    linear-gradient(180deg, rgba(34, 29, 22, 0.58) 0%, rgba(34, 29, 22, 0.76) 100%);
   color: #fffaf0;
+}
+
+.board-overlay--visible {
+  display: grid;
+}
+
+.overlay-copy-block {
+  display: grid;
+  gap: 8px;
 }
 
 .board-overlay strong {
   display: block;
-  font-size: 1.35rem;
+  font-size: 1.6rem;
 }
 
 .board-overlay p {
-  margin: 8px 0 0;
+  margin: 0;
   max-width: 24ch;
   color: rgba(255, 250, 240, 0.88);
+}
+
+.overlay-button {
+  min-width: 160px;
+  border-color: rgba(255, 248, 236, 0.35);
+  background: rgba(255, 248, 236, 0.14);
+  color: #fffaf0;
+}
+
+.overlay-button:hover {
+  background: rgba(255, 248, 236, 0.24);
+  border-color: rgba(255, 248, 236, 0.5);
 }
 
 .actions {
@@ -358,11 +394,7 @@ button:focus-visible {
   }
 
   .meta-strip {
-    width: 100%;
-  }
-
-  .metric-card {
-    flex: 1;
+    min-width: 0;
   }
 }
 
@@ -383,7 +415,7 @@ button:focus-visible {
 
   .meta-strip {
     width: 100%;
-    flex-direction: column;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .actions {

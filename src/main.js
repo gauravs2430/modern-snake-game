@@ -1,15 +1,19 @@
 import {
   createInitialState,
   queueDirection,
+  startGame,
   stepGame,
   togglePause,
 } from "./game.js";
 
 const GRID_SIZE = 16;
 const TICK_MS = 140;
+const BEST_SCORE_KEY = "modern-snake-best-score";
 
 const board = document.querySelector("#board");
 const score = document.querySelector("#score");
+const bestScoreLabel = document.querySelector("#best-score");
+const lengthLabel = document.querySelector("#snake-length");
 const status = document.querySelector("#status");
 const statePill = document.querySelector("#state-pill");
 const pauseButton = document.querySelector("#pause-button");
@@ -17,14 +21,33 @@ const restartButton = document.querySelector("#restart-button");
 const boardOverlay = document.querySelector("#board-overlay");
 const overlayTitle = document.querySelector("#overlay-title");
 const overlayCopy = document.querySelector("#overlay-copy");
+const overlayButton = document.querySelector("#overlay-button");
 const directionButtons = document.querySelectorAll("[data-direction]");
 
 let state = createInitialState({
   width: GRID_SIZE,
   height: GRID_SIZE,
 });
+let bestScore = readBestScore();
 
 const cells = [];
+
+function readBestScore() {
+  try {
+    const storedValue = Number(window.localStorage.getItem(BEST_SCORE_KEY));
+    return Number.isFinite(storedValue) && storedValue >= 0 ? storedValue : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveBestScore(nextBestScore) {
+  try {
+    window.localStorage.setItem(BEST_SCORE_KEY, String(nextBestScore));
+  } catch {
+    // Ignore storage failures so the game still works in restricted browsers.
+  }
+}
 
 function buildBoard() {
   board.style.setProperty("--board-size", String(GRID_SIZE));
@@ -44,6 +67,8 @@ function toIndex(position) {
 
 function getStatusCopy() {
   switch (state.status) {
+    case "ready":
+      return "Press Start or use any direction key to begin the round.";
     case "paused":
       return "Paused. Press Space or Resume to continue.";
     case "game-over":
@@ -57,6 +82,8 @@ function getStatusCopy() {
 
 function getStateLabel() {
   switch (state.status) {
+    case "ready":
+      return "Ready";
     case "paused":
       return "Paused";
     case "game-over":
@@ -70,24 +97,42 @@ function getStateLabel() {
 
 function getOverlayContent() {
   switch (state.status) {
+    case "ready":
+      return {
+        title: "Ready to Play",
+        copy: "Press Start, tap a direction, or use your keyboard to begin.",
+        actionLabel: "Start Round",
+      };
     case "paused":
       return {
         title: "Paused",
         copy: "Press Space or use Resume whenever you are ready.",
+        actionLabel: "Resume",
       };
     case "game-over":
       return {
         title: "Game Over",
         copy: "You hit a wall or your own body. Restart to try again.",
+        actionLabel: "Try Again",
       };
     case "won":
       return {
         title: "Board Cleared",
         copy: "Every open cell has been filled. Restart for another run.",
+        actionLabel: "Play Again",
       };
     default:
       return null;
   }
+}
+
+function syncBestScore() {
+  if (state.score <= bestScore) {
+    return;
+  }
+
+  bestScore = state.score;
+  saveBestScore(bestScore);
 }
 
 function render() {
@@ -105,21 +150,33 @@ function render() {
     cells[toIndex(state.food)].classList.add("cell--food");
   }
 
+  syncBestScore();
   score.textContent = String(state.score);
+  bestScoreLabel.textContent = String(bestScore);
+  lengthLabel.textContent = String(state.snake.length);
   status.textContent = getStatusCopy();
   statePill.textContent = getStateLabel();
   statePill.dataset.state = state.status;
-  pauseButton.textContent = state.status === "paused" ? "Resume" : "Pause";
+  pauseButton.textContent = state.status === "ready"
+    ? "Start"
+    : state.status === "paused"
+      ? "Resume"
+      : "Pause";
   pauseButton.disabled = state.status === "game-over" || state.status === "won";
 
   const overlay = getOverlayContent();
 
   if (overlay) {
-    boardOverlay.hidden = false;
+    boardOverlay.classList.add("board-overlay--visible");
+    boardOverlay.setAttribute("aria-hidden", "false");
     overlayTitle.textContent = overlay.title;
     overlayCopy.textContent = overlay.copy;
+    overlayButton.hidden = false;
+    overlayButton.textContent = overlay.actionLabel;
   } else {
-    boardOverlay.hidden = true;
+    boardOverlay.classList.remove("board-overlay--visible");
+    boardOverlay.setAttribute("aria-hidden", "true");
+    overlayButton.hidden = true;
   }
 }
 
@@ -131,8 +188,18 @@ function restartGame() {
   render();
 }
 
+function beginRound(input) {
+  state = startGame(state, input);
+  render();
+}
+
 function handleDirectionInput(input) {
   if (state.status === "game-over" || state.status === "won") {
+    return;
+  }
+
+  if (state.status === "ready") {
+    beginRound(input);
     return;
   }
 
@@ -143,6 +210,10 @@ function handleDirectionInput(input) {
 document.addEventListener("keydown", (event) => {
   if (event.key === " ") {
     event.preventDefault();
+    if (state.status === "ready") {
+      beginRound();
+      return;
+    }
     state = togglePause(state);
     render();
     return;
@@ -170,11 +241,30 @@ for (const button of directionButtons) {
 }
 
 pauseButton.addEventListener("click", () => {
+  if (state.status === "ready") {
+    beginRound();
+    return;
+  }
   state = togglePause(state);
   render();
 });
 
 restartButton.addEventListener("click", () => {
+  restartGame();
+});
+
+overlayButton.addEventListener("click", () => {
+  if (state.status === "ready") {
+    beginRound();
+    return;
+  }
+
+  if (state.status === "paused") {
+    state = togglePause(state);
+    render();
+    return;
+  }
+
   restartGame();
 });
 

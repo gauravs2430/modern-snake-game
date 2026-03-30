@@ -105,7 +105,7 @@ export function createInitialState(options = {}) {
     nextDirection: direction,
     food: placeFood(width, height, snake, options.rng),
     score: 0,
-    status: "running",
+    status: options.status ?? "ready",
   };
 }
 
@@ -123,6 +123,20 @@ export function queueDirection(state, input) {
   return {
     ...state,
     nextDirection,
+  };
+}
+
+export function startGame(state, input) {
+  const requestedDirection = normalizeDirection(input);
+  const nextDirection = requestedDirection &&
+    OPPOSITE_DIRECTIONS[state.direction] !== requestedDirection
+    ? requestedDirection
+    : state.direction;
+
+  return {
+    ...state,
+    nextDirection,
+    status: "running",
   };
 }
 

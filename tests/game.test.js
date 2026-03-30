@@ -6,6 +6,7 @@ import {
   createInitialState,
   placeFood,
   queueDirection,
+  startGame,
   stepGame,
 } from "../src/game.js";
 
@@ -21,6 +22,24 @@ test("createInitialState creates a centered starter snake", () => {
   ]);
   assert.equal(state.direction, DIRECTIONS.RIGHT);
   assert.equal(state.score, 0);
+  assert.equal(state.status, "ready");
+});
+
+test("startGame transitions a ready round into running and accepts a first move", () => {
+  const started = startGame(
+    createInitialState({ width: 12, height: 10, rng: () => 0 }),
+    "ArrowUp",
+  );
+
+  assert.equal(started.status, "running");
+  assert.equal(started.nextDirection, DIRECTIONS.UP);
+});
+
+test("stepGame does not advance while the round is still ready", () => {
+  const readyState = createInitialState({ width: 12, height: 10, rng: () => 0 });
+  const nextState = stepGame(readyState);
+
+  assert.deepEqual(nextState, readyState);
 });
 
 test("queueDirection ignores immediate reverse turns", () => {

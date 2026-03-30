@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snake</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=20260330-2" />
 </head>
 
 <body>
@@ -25,6 +25,14 @@
             <strong id="score">0</strong>
           </div>
           <div class="metric-card">
+            <span class="metric-label">Best</span>
+            <strong id="best-score">0</strong>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Length</span>
+            <strong id="snake-length">3</strong>
+          </div>
+          <div class="metric-card">
             <span class="metric-label">State</span>
             <strong class="state-pill" id="state-pill">Running</strong>
           </div>
@@ -36,9 +44,14 @@
       <div class="game-layout">
         <div class="play-area">
           <div class="board-stage">
-            <div class="board-overlay" id="board-overlay" hidden>
-              <strong id="overlay-title">Paused</strong>
-              <p id="overlay-copy">Press Space or Resume to continue.</p>
+            <div class="board-overlay" id="board-overlay" aria-hidden="true">
+              <div class="overlay-copy-block">
+                <strong id="overlay-title">Paused</strong>
+                <p id="overlay-copy">Press Space or Resume to continue.</p>
+              </div>
+              <button class="overlay-button" id="overlay-button" type="button">
+                Resume
+              </button>
             </div>
             <div class="board" id="board" role="grid" aria-label="Snake game board"></div>
           </div>
@@ -78,8 +91,9 @@
 
         <aside class="info-panel" aria-label="Game information">
           <section class="panel-card">
-            <h2>How to play</h2>
+            <h2>Round flow</h2>
             <ul class="panel-list">
+              <li>Each round now starts in a ready state instead of moving instantly.</li>
               <li>Guide the snake toward the food.</li>
               <li>Each food pickup grows the snake by one segment.</li>
               <li>Avoid walls and your own body.</li>
@@ -102,12 +116,21 @@
               <span>Food</span>
             </div>
           </section>
+
+          <section class="panel-card">
+            <h2>Quick tips</h2>
+            <ul class="panel-list">
+              <li>Tap a direction immediately to start with that turn queued.</li>
+              <li>Use restart after a crash to reset the board without auto-moving.</li>
+              <li>Try to protect open lanes near the center as the snake gets longer.</li>
+            </ul>
+          </section>
         </aside>
       </div>
     </section>
   </main>
 
-  <script type="module" src="./src/main.js"></script>
+  <script type="module" src="./src/main.js?v=20260330-2"></script>
 </body>
 
 </html>

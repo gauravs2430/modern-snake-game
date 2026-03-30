@@ -10,6 +10,7 @@ This is a modern presentation of the classic Snake formula:
 - Food spawns in open cells only.
 - Eating food grows the snake and increases the score.
 - Hitting a wall or your own body ends the run.
+- Each round starts in a ready state, so the snake does not move until you begin.
 - You can pause and restart at any time.
 
 I intentionally kept the project lightweight. There are no external libraries or frameworks here. The game runs with plain HTML, CSS, and JavaScript, and the core logic is separated from the DOM so the rules are easy to test.
@@ -41,6 +42,7 @@ npm run dev
 ## How to play
 
 - Use the arrow keys or `W`, `A`, `S`, `D` to move.
+- The game starts when you press `Start` or your first direction key.
 - On touch devices, use the on-screen direction buttons.
 - Eat the food to grow and increase your score.
 - Avoid the walls and your own body.
@@ -53,7 +55,10 @@ npm run dev
 - Deterministic game logic separated from the UI
 - Food spawning only in valid, unoccupied cells
 - Score tracking
+- Best score tracking in local storage
+- Snake length tracking in the HUD
 - Game-over and board-cleared states
+- Ready-state start screen so the round does not auto-crash on load
 - Pause and restart controls
 - Keyboard and on-screen controls
 - Responsive single-page layout
